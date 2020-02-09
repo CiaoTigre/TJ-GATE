@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>大眼睛酒保</title>
+    <link rel="stylesheet" href="stylesheets/layui.css">
+    <style type="text/css">
+        html, body {
+            margin: 0;
+            height: 100%;
+        }
+
+        body {
+
+            background-color: #000000;
+            margin: 0;
+            font-family: Helvetica, sans-serif;;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+        }
+        .visible{
+            height:100%
+        }
+        .background{
+            display:flex;
+            flex-direction:row;
+            height:100%;
+            justify-content:center;
+        }
+        .bimg{
+            position: absolute;
+            left:0;
+            top:0;
+            width:100%;
+            height:100%;
+            z-index: -1;
+        }
+        .left{
+            height:100%;
+            width:50%;
+            display:flex;
+            flex-direction:column;
+            justify-content:flex-start;
+            align-items:center;
+        }
+        .left .divimg{
+            width:100%;
+            height:50%;
+            position:relative;
+        }
+        .left .divimg img{
+            width:100%;
+            height:100%;
+        }
+        .left .divtalk{
+            width:100%;
+            height:50%;
+            position:relative;
+            background:url(./images/liaotian.png);
+            background-repeat: no-repeat;
+            background-size:80% 100%;
+            background-position:center;
+
+        }
+        .left span{
+            z-index: 1;
+            color:black;
+            position:absolute;
+            left:30%;
+            top:45%;
+            overflow:hidden;
+        }
+
+        .right{
+            height:100%;
+            width:50%;
+            align-items:center;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+        }
+        .box{
+            width:90%;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            align-items:center;
+            border:3px solid #6495ED;
+            border-radius:3px;
+            background:rgba(25,25,112,0.5);
+            margin:10px;
+            box-shadow: 3px 3px 3px rgba(100,149,237,0.5),3px -3px 3px rgba(100,149,237,0.5),-3px 3px 3px rgba(100,149,237,0.5),-3px -3px 3px rgba(100,149,237,0.5);
+            overflow:hidden;
+        }
+        .box2{
+            width:90%;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            align-items:center;
+            border:3px solid rgba(100,149,237,1);
+            border-radius:3px;
+            background:rgba(135,206,255,0.7);
+            margin:10px;
+            box-shadow: 3px 3px 3px rgba(100,149,237,0.5),3px -3px 3px rgba(100,149,237,0.5),-3px 3px 3px rgba(100,149,237,0.5),-3px -3px 3px rgba(100,149,237,0.5);
+        }
+        .title{
+            width:100%;
+            height:10%;
+            background:url(./images/titlebar.png);
+            background-repeat: no-repeat;
+            background-size:100%;
+            background-position:bottom;
+            display:flex;
+            flex-direction: column;
+            justify-content: center;
+
+        }
+        .title span{
+            font-family: "Arial","Microsoft YaHei","黑体","宋体",sans-serif;
+            float:left;color:#fff;font-size:20px;text-algin:center;
+            padding-left: 10px;
+        }
+        .boxtitle{
+            width:40%;
+            height:30%;
+            color:#fff;
+            font-size:25px;
+            font-family: "STKaiti","KaiTi","FangSong",sans-serif;
+            font-weight:bold;
+            text-align: center;
+        }
+        .content{
+            width:100%;
+            height:90%;
+            overflow:auto;
+        }
+        .loadPic{
+            display:flex;
+            flex-direction:column;
+            justify-content:flex-start;
+            align-items:center;
+            overflow:auto;
+        }
+        .loadPic img{
+            width:auto;
+            height:100%;
+        }
+        .orderList{
+            overflow-y:scroll;
+        }
+        .orderId{
+            width:90%;
+            height:10%;
+            color:#fff;
+            font-size:20px;
+            padding-left:5%;
+            padding-right:5%;
+            padding-top: 2%;
+        }
+        .orderfinished{
+            position:absolute;
+            top:30%;
+            left:30%;
+            width:35%;
+            height:45%;
+            opacity:0.7;
+        }
+        .orderItem{
+            display:flex;
+            flex-direction:row;
+            justify-content:space-between;
+            align-items:center;
+            width:100%;
+            height:20%;
+            color:#fff;
+            font-size:20px;
+            text-align: center;
+        }
+        .finishedorderItem{
+            display:flex;
+            flex-direction:row;
+            justify-content:space-between;
+            align-items:center;
+            width:100%;
+            height:15%;
+            color:#fff;
+            font-size:20px;
+            text-align: center;
+        }
+
+        .content2{
+            width:100%;
+            height:80%;
+            overflow-y:scroll;
+        }
+        .tab{
+            width:100%;
+            height:10%;
+            overflow:auto;
+            display:flex;
+            flex-direction: row;
+            margin-bottom:3px;
+            align-items: center;
+        }
+        .tabc{
+            border-bottom:2px solid deepskyblue;
+            color:deepskyblue;
+        }
+        .tabn{
+            border-bottom:1px solid lightgray;
+            color:lightgray;
+        }
+        .tabtitle{
+            width:25%;
+            height:90%;
+            display:flex;
+            justify-content:center;
+            align-items: center;
+            font-size:18px;
+        }
+        #pagebar{
+            height:5%;
+        }
+        .gridwrapper{
+            display: grid;
+            grid-template-columns: 50% 50%;
+            grid-template-rows: repeat(8,12%);
+
+        }
+        .item{
+            color:#fff;
+            font-size:13px;
+            display:flex;
+            flex-direction:row;
+            justify-content:space-between;
+            align-items:center;
+            padding-right:5%;
+        }
+        .itemchecked{
+            background:rgba(84,255,159,0.5);
+        }
+        .itemRec{
+            //background:rgba(255,130,71,0.5);
+        }
+        .item .drinkdes{
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            align-items:center;
+        }
+        .temAndSize{
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            align-items:center;
+            width:10%;
+            height:100%;
+        }
+        .item .drinkpc{
+            width:20%;
+            height:90%;
+        }
+        .detailpc{
+            width:10%;
+            height:90%;
+
+        }
+        .content .drinktable tr{
+            height:80px;
+        }
+        .content table{
+            font-family:STKaiti,KaiTi;
+            width:100%;
+            height:100%;
+            color:#2F4F4F;
+            font-size:10px;
+            text-align: center;
+            overflow:scroll;
+        }
+        .detailDrinkTemp{
+            overflow:auto
+        }
+        .detailDrinkSize{
+            overflow:auto
+        }
+
+        .element {
+
+            /*width: 200px;*/
+            /*height: 220px;*/
+            background-color: rgba(0, 127, 127, 0.50784);
+            transform: translate(-50%, -50%);
+            box-shadow: 0px 0px 12px rgba(0,255,255,0.5);
+            border: 1px solid rgba(127,255,255,0.25);
+            text-align: center;
+            cursor: default;
+        }
+
+        .element:hover {
+            box-shadow: 0px 0px 12px rgba(0,255,255,0.75);
+            border: 1px solid rgba(127,255,255,0.75);
+        }
+
+        .element .number {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 12px;
+            color: rgba(127,255,255,0.75);
+        }
+
+        .element .symbol {
+            position: absolute;
+            top: 5px;
+            left: 0px;
+            right: 0px;
+            font-size: 30px;
+            font-weight: bold;
+            color: rgba(255,255,255,0.75);
+            text-shadow: 0 0 10px rgba(0,255,255,0.95);
+        }
+
+        .element .details {
+            position: absolute;
+            bottom: 15px;
+            left: 0px;
+            right: 0px;
+            font-size: 18px;
+            color: rgba(127,255,255,0.75);
+        }
+
+        #face_rect {
+            z-index: 1;
+            position: absolute;
+            left: 0;
+            /*right: 0;*/
+            top: 20px;
+
+            height: 100px;
+
+            /*background-color: #000;*/
+            color: white;
+
+            padding: 0;
+            border-style: solid;
+            border-width: thick;
+            border-color: #ff3106;
+        }
+
+        #raw_rect {
+            z-index: 1;
+            position: absolute;
+            left: 0;
+            /*right: 0;*/
+            top: -20px;
+
+            height: 0px;
+
+            /*background-color: #000;*/
+            color: white;
+
+            padding: 0;
+            border-style: solid;
+            border-width: thick;
+            border-color: #1eff26;
+        }
+        #load{width:100%;height:100%;position:absolute;background:url(./images/data08.png) no-repeat #061537;background-size:100%;top:0;left:0;z-index:999}
+        #welcome{
+            width:100%;height:100%;position:absolute;
+            background:url(./images/welcome.png);
+            background-repeat: no-repeat;
+            background-size:100% 100%;
+            z-index: 10;
+            display:flex;
+            flex-direction:column;
+            justify-content:flex-start;
+            align-items:center;
+        }
+        #welcome span{
+            padding-top: 100px;
+            font-family: 华文琥珀;
+            color:#D2E9FF;
+            font-size: 30px;
+        }
+        #load .load_img{position:absolute;left:calc(50% - 182px);top:calc(50% - 182px);}
+        .load_img img{position:absolute;left:0;top:0;}
+        .load_img .jzxz1{animation:xz1 8s infinite linear;}
+        @keyframes xz1 {
+            from {
+                transform:rotate(0deg);
+            }
+            50% {
+                transform:rotate(180deg);
+            }
+            to{
+                transform:rotate(360deg);
+            }
+        }
+        .load_img .jzxz2{animation:xz2 7s infinite linear;}
+        @keyframes xz2 {
+            from {
+                transform:rotate(0deg);
+            }
+            50% {
+                transform:rotate(-180deg);
+            }
+            to{
+                transform:rotate(-360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="visible">
+    <div id="load">
+        <div class="load_img">
+            <!-- 加载动画 -->
+            <img class="jzxz1" src="./images/jzxz1.png">
+            <img class="jzxz2" src="./images/jzxz2.png">
+        </div>
+    </div>
+    <div id="welcome">
+        <span>欢迎来到遇见AI智能吧台</span>
+    </div>
+    <div class="background">
+        <div class="left">
+            <div class="divimg">
+                <img src="/face.mjpg"/>
+                <div id="face_rect"> </div>
+            </div>
+            <div class="divtalk">
+                <span id="language" class="boxtitle">
+
+                </span>
+            </div>
+        </div>
+        <div class="right">
+            <div class="box2" style="position:absolute; top:2%; right:51%; width:12%; height:30%;">
+                <div class="title">
+                    <span style="font-size:12px;font-family:STKaiti,KaiTi;color:#2F4F4F;line-height:0%;padding-left: 2px;">识别信息</span>
+                </div>
+                <div class="content">
+                    <table>
+                        <tr>
+                            <td width="50%">姓名</td>
+                            <td id="face_name">-</td>
+                        </tr>
+                        <tr>
+                            <td>性别</td>
+                            <td id="face_gender">-</td>
+                        </tr>
+                        <tr>
+                            <td>年龄</td>
+                            <td id="face_age">-</td>
+                        </tr>
+                        <tr>
+                            <td>眼镜</td>
+                            <td id="face_glass">-</td>
+                        </tr>
+                        <tr>
+                            <td>表情</td>
+                            <td id="face_expression">-</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div id="drinkList" class="box"style="height:100%;position:relative">
+                <button class="layui-btn layui-btn-normal  layui-btn-radius" style="position:absolute;right:31%;top:1%;" type="button" onclick="recommend()">推荐</button>
+                <button class="layui-btn layui-btn-normal  layui-btn-radius" style="position:absolute;right:16%;top:1%;" type="button" onclick="deleteDrink()">清除</button>
+                <button id="addOrder" class="layui-btn layui-btn-normal  layui-btn-radius" style="position:absolute;right:1%;top:1%;" type="button" onclick="addOrder(this)">结算</button>
+                <div class="title">
+                    <span>饮品菜单</span>
+                </div>
+                <div class="tab">
+                    <div class="tabtitle tabc" id="tab1" onclick="showTab1()">
+                        咖啡
+                    </div>
+                    <div class="tabtitle tabn" id="tab2" onclick="showTab2()">
+                        鸡尾酒
+                    </div>
+                    <div class="tabtitle tabn" id="tab3" onclick="showTab3()">
+                        其他
+                    </div>
+                    <div class="tabtitle tabn" id="tab4" onclick="showTab4()">
+                        推荐
+                    </div>
+                </div>
+                <div class="content2 gridwrapper" id="tabcontent1">
+
+                </div>
+                <div class="content2 gridwrapper" id="tabcontent2">
+
+                </div>
+                <div class="content2 gridwrapper" id="tabcontent3">
+
+                </div>
+                <div class="content2 gridwrapper" id="tabcontent4">
+
+                </div>
+
+            </div>
+            <div id="orderDetail" class="box" style="display: none; height:100%;position:relative" >
+                <button id="backbutton" class="layui-btn layui-btn-normal   layui-btn-radius" style="position:absolute;right:16%;top:1%;" type="button" onclick="backToDrinkOrOrder(this)">返回</button>
+                <button id="generateOrder" class="layui-btn layui-btn-normal  layui-btn-radius" style="position:absolute;right:1%;top:1%;" type="button" onclick="generateOrder()">下单</button>
+                <div class="title">
+                    <span>订单信息</span>
+                </div>
+                <div class="content loadPic">
+                    <img  src="./images/loading2.gif">
+                </div>
+                <div class="content orderList">
+                    <div class="orderId">
+                        订单ID：
+                    </div>
+                    <!--
+                    <div class="orderItem">
+                        <div>
+
+                        </div>
+                        <div>
+                            橙汁
+                        </div>
+                        <div>
+                            15
+                        </div>
+                        <div>
+                            <button class="layui-btn layui-btn-normal layui-btn-sm" type="button">常温</button>
+                        </div>
+                        <div>
+                            <button class="layui-btn layui-btn-normal layui-btn-sm" type="button">小杯</button>
+                        </div>
+                        <img class="detailpc" src="./images/tdrink.jpg" >
+                        <div>
+
+                        </div>
+                    </div>-->
+                </div>
+                <div class="orderfinished">
+                    <img src="./images/orderfinished.png" style="width:100%;height:100%;">
+                </div>
+            </div>
+        </div>
+        <img class="bimg" src="./images/bcg2.jpg"/>
+    </div>
+
+   <!-- <div style="float: right">
+    <div class="element" style="position:absolute; top:120px; right:46%; width:180px; height:220px;  ">
+        <div class="number">1</div>
+        <div class="symbol">识别信息</div>
+        <div class="details" >
+            <table style="width:100%; position:absolute; bottom:0; left:20px;">
+                <tr><td align="left">姓名</td><td id="face_name" align="left">-</td></tr>
+                <tr><td align="left">性别</td><td id="face_gender" align="left">-</td></tr>
+                <tr><td align="left">年龄</td><td id="face_age" align="left">-</td></tr>
+                <tr><td align="left">眼镜</td><td id="face_glass" align="left">-</td></tr>
+                <tr><td align="left">表情</td><td id="face_expression" align="left">-</td></tr>
+            </table>
+
+        </div>
+    </div>-->
+
+</div>
+
+<!--<div id="face_rect"> </div>-->
+<div id="raw_rect"> </div>
+
+
+<!--<div id="mask" style="float: right; width: 50%; ">-->
+<!--    &lt;!&ndash;<div style="position:absolute; top:-75px; right:-27%;">&ndash;&gt;-->
+<!--    <div style="position:absolute; top:-55px; right:-15%;">-->
+<!--        <img src="/resource/ailogo.svg" style="width:50%; margin: -0px 0 0 0px; opacity: 0.7;">-->
+<!--    </div>-->
+
+<!--</div>-->
+
+</body>
+<script src="javascripts/libs/jquery-3.4.0.min.js"></script>
+<script src="javascripts/libs/layui.all.js"></script>
+<script>
+var remote="http://106.15.206.196:8011"
+    function deleteDrink()
+    {
+        var menus=menudata.menu;
+        var length=menus.length;
+        for(var i=0;i<length;i++)
+        {
+            menus[i].ismenudataChecked=0
+            menus[i].drinkNumber=0
+        }
+        $("#tabcontent1").empty()
+        $("#tabcontent2").empty()
+        $("#tabcontent3").empty()
+        $("#tabcontent4").empty()
+        for(var i=0;i<length;i++)
+        {
+            var elementStr="<div class=\"item\" onclick=\"clickItem(this,"+i+","+menudata.menu[i].drinkNumber+")\">\n" +
+                "                        <div>\n" +
+                "                        </div>\n" +
+                "                        <input name=\"\" type=\"checkbox\" value=\"\" />\n" +
+                "                        <div class=\"drinkdes\" style=\"width:40%\">\n" +
+                "                            <div class=\"drinkname\">\n" +
+                "                                -\n" +
+                "                            </div>\n" +
+                "                            <div class=\"drinkprice\">\n" +
+                "                                -\n" +
+                "                            </div>\n" +
+                "                            <div class=\"drinkvaluecontroler\" style=\"display:flex;height:33%;justify-content: center;align-items: center;flex-direction:row;\">\n" +
+                "\n" +
+                "                                <input style=\"width: 33%; height: 100%; border: 2px white; \" type=\"button\" value=\"-\" onclick=\"reductionOf(this,"+i+",event)\" />\n" +
+                "\n" +
+                "                                <input class=\"drinkvalue\" style=\"text-align: center; width: 33%; height: 100%; \" type=\"text\" value=\""+menudata.menu[i].drinkNumber+"\" />\n" +
+                "\n" +
+                "                                <input style=\"width: 33%; height:  100%; border: 2px white;\" type=\"button\" value=\"+\" onclick=\"add(this,"+i+",event)\" />\n" +
+                "\n" +
+                "                            </div>\n" +
+                "                        </div>\n" +
+                //"                        <img class=\"drinkpc\" src="+menus[i].img+" >\n" +
+                "<div class=\"drinkpc\" style=\"position:relative\">\n" +
+                "                            <img style=\"width:100%;height:100%\" src="+menus[i].img+" >\n" +
+                "                            <img class=\"rec\" style=\"position:absolute;top:1%;right:1%;width:60%;height:60%\" src=\"./images/rec.png\">\n" +
+                "                        <div>\n" +
+                "                        </div>\n" +
+                "                    </div>"
+            /*var elementStr="                        <div class=\"temAndSize\">\n" +
+                "                            <div class=\"layui-row\" style=\"padding-bottom: 5px\">\n" +
+                "                                <button onclick=\"changeTemp(this,"+i+")\" class=\"drinkTemp layui-btn layui-btn-normal layui-btn-sm\" type=\"button\">常温</button>\n" +
+                "                            </div>\n" +
+                "                            <div class=\"layui-row\">\n" +
+                "                                <button onclick=\"changeSize(this,"+i+")\" class=\"drinkSize layui-btn layui-btn-normal layui-btn-sm\" type=\"button\">小杯</button>\n" +
+                "                            </div>\n" +
+                "                        </div>" +*/
+            var $newElement=$(elementStr)
+            if(menus[i].ismenudataChecked==1)
+            {
+                $newElement.addClass("itemchecked")
+                $newElement.find("input").get(0).checked=true;
+            }
+            else
+            {
+                var a=$newElement.find(".drinkvaluecontroler").get(0);
+                $(a).hide()
+                /*if(i>=recNum)
+                {
+                    $newElement.find(".rec").get(0).style.visibility="hidden";
+                }*/
+            }
+            if(menus[i].ismenudataRec==0)
+            {
+                $newElement.find(".rec").get(0).style.visibility="hidden";
+            }
+            else
+            {
+                $newElement.addClass("itemRec")
+            }
+            $newElement.find(".drinkname").get(0).innerHTML=""+menus[i].nameCn
+            $newElement.find(".drinkprice").get(0).innerHTML="¥"+menus[i].price
+            if(menus[i].ismenudataRec==1)
+            {
+                $("#tabcontent4").append($newElement)
+            }
+            else if(menus[i].category=="咖啡")
+            {
+                $("#tabcontent1").append($newElement)
+            }
+            else if(menus[i].category=="鸡尾酒")
+            {
+                $("#tabcontent2").append($newElement)
+            }
+            else
+            {
+                $("#tabcontent3").append($newElement)
+            }
+        }
+    }
+    //var recNum=0
+    function recommend()
+    {
+        var x={}
+        x.age=21
+        x.gender="male"
+        $.ajax({
+            //请求方式
+            type : "POST",
+            //请求的媒体类型
+            contentType: "application/json;charset=UTF-8",
+            //请求地址
+            url : remote+"/api/v1/menu/getDrinkRecommendation",
+            //数据，json字符串
+            data : JSON.stringify(x),
+            //请求成功
+            success : function(result) {
+                if(result.errno!=0)
+                {
+                    layer.open({
+                        type: 1
+                        ,offset: 'rb' //具体配置参考：http://www.layui.com/doc/modules/layer.html#offset
+                        ,id: 'layerDemo'+'rb' //防止重复弹出
+                        ,content: '<div style="padding: 20px 100px;">'+'请求数据失败' +'</div>'
+                        ,btn: '关闭全部'
+                        ,btnAlign: 'c' //按钮居中
+                        ,shade: 0 //不显示遮罩
+                        ,yes: function(){
+                            layer.closeAll();
+                        }
+                    });
+                }
+                console.log(result);
+                var recoList=[]
+                //recNum=result.recommendation.length;
+                for(var i=0;i<result.recommendation.length;i++)
+                {
+                    for(var j=0;j<menudata.menu.length;j++)
+                    {
+                        if(result.recommendation[i].drinkID==menudata.menu[j].productId)
+                        {
+                            recoList.push(menudata.menu[j])
+                            menudata.menu.splice(j,1)
+                        }
+                    }
+                    //menudata.menu[i].ismenudataRec=1;
+                }
+                menudata.menu=recoList.concat(menudata.menu)
+                var menus=menudata.menu;
+                var length=menus.length;
+                for(var i=0;i<length;i++)
+                {
+                    /*if(menus[i].ismenudataChecked==1)
+                    {
+                        ismenudataChecked[i]=0
+                        ismenudataChecked[i+result.recommendation.length]=1
+                    }
+                    if(drinkNumber[i]>0)
+                    {
+                        drinkNumber[i+result.recommendation.length]=drinkNumber[i]
+                        drinkNumber[i]=0
+                    }*/
+                    menudata.menu[i].ismenudataRec=0;
+                }
+                for(var i=0;i<result.recommendation.length;i++)
+                {
+                    menudata.menu[i].ismenudataRec=1
+                    //ismenudataChecked[i]=1
+                    //drinkNumber[i]=1
+                    //ismenudataChecked[i]=1
+                }
+                $("#tabcontent1").empty()
+                $("#tabcontent2").empty()
+                $("#tabcontent3").empty()
+                $("#tabcontent4").empty()
+                for(var i=0;i<length;i++)
+                {
+                    var elementStr="<div class=\"item\" onclick=\"clickItem(this,"+i+","+menudata.menu[i].drinkNumber+")\">\n" +
+                        "                        <div>\n" +
+                        "                        </div>\n" +
+                        "                        <input name=\"\" type=\"checkbox\" value=\"\" />\n" +
+                        "                        <div class=\"drinkdes\" style=\"width:40%\">\n" +
+                        "                            <div class=\"drinkname\">\n" +
+                        "                                -\n" +
+                        "                            </div>\n" +
+                        "                            <div class=\"drinkprice\">\n" +
+                        "                                -\n" +
+                        "                            </div>\n" +
+                        "                            <div class=\"drinkvaluecontroler\" style=\"display:flex;height:33%;justify-content: center;align-items: center;flex-direction:row;\">\n" +
+                        "\n" +
+                        "                                <input style=\"width: 33%; height: 100%; border: 2px white; \" type=\"button\" value=\"-\" onclick=\"reductionOf(this,"+i+",event)\" />\n" +
+                        "\n" +
+                        "                                <input class=\"drinkvalue\" style=\"text-align: center; width: 33%; height: 100%; \" type=\"text\" value=\""+menudata.menu[i].drinkNumber+"\" />\n" +
+                        "\n" +
+                        "                                <input style=\"width: 33%; height:  100%; border: 2px white;\" type=\"button\" value=\"+\" onclick=\"add(this,"+i+",event)\" />\n" +
+                        "\n" +
+                        "                            </div>\n" +
+                        "                        </div>\n" +
+                        //"                        <img class=\"drinkpc\" src="+menus[i].img+" >\n" +
+                        "<div class=\"drinkpc\" style=\"position:relative\">\n" +
+                        "                            <img style=\"width:100%;height:100%\" src="+menus[i].img+" >\n" +
+                        "                            <img class=\"rec\" style=\"position:absolute;top:1%;right:1%;width:60%;height:60%\" src=\"./images/rec.png\">\n" +
+                        "                        <div>\n" +
+                        "                        </div>\n" +
+                        "                    </div>"
+                    /*var elementStr="                        <div class=\"temAndSize\">\n" +
+                        "                            <div class=\"layui-row\" style=\"padding-bottom: 5px\">\n" +
+                        "                                <button onclick=\"changeTemp(this,"+i+")\" class=\"drinkTemp layui-btn layui-btn-normal layui-btn-sm\" type=\"button\">常温</button>\n" +
+                        "                            </div>\n" +
+                        "                            <div class=\"layui-row\">\n" +
+                        "                                <button onclick=\"changeSize(this,"+i+")\" class=\"drinkSize layui-btn layui-btn-normal layui-btn-sm\" type=\"button\">小杯</button>\n" +
+                        "                            </div>\n" +
+                        "                        </div>" +*/
+                    var $newElement=$(elementStr)
+                    if(menus[i].ismenudataChecked==1)
+                    {
+                        $newElement.addClass("itemchecked")
+                        $newElement.find("input").get(0).checked=true;
+                    }
+                    else
+                    {
+                        var a=$newElement.find(".drinkvaluecontroler").get(0);
+                        $(a).hide()
+                        /*if(i>=recNum)
+                        {
+                            $newElement.find(".rec").get(0).style.visibility="hidden";
+                        }*/
+                    }
+                    if(menus[i].ismenudataRec==0)
+                    {
+                        $newElement.find(".rec").get(0).style.visibility="hidden";
+                    }
+                    else
+                    {
+                        $newElement.addClass("itemRec")
+                    }
+                    $newElement.find(".drinkname").get(0).innerHTML=""+menus[i].nameCn
+                    $newElement.find(".drinkprice").get(0).innerHTML="¥"+menus[i].price
+                    if(menus[i].ismenudataRec==1)
+                    {
+                        $("#tabcontent4").append($newElement)
+                    }
+                    else if(menus[i].category=="咖啡")
+                    {
+                        $("#tabcontent1").append($newElement)
+                    }
+                    else if(menus[i].category=="鸡尾酒")
+                    {
+                        $("#tabcontent2").append($newElement)
+                    }
+                    else
+                    {
+                        $("#tabcontent3").append($newElement)
+                    }
+                    showTab4()
+                }
+
+            },
+            //请求失败，包含具体的错误信息
+            error : function(e){
+                console.log(e.status);
+                console.log(e.responseText);
+            }
+        });
+    }
+    //减数量
+    function reductionOf(obj,index,event) {
+        //减前判断
+        if ($(obj).next().val() == '') {
+            $(obj).next().val(1);
+        }
+        if(menudata.menu[index].drinkNumber - 1>0) {
+            //$(obj).next().val(parseInt($(obj).next().val()) - 1);//数值减
+            menudata.menu[index].drinkNumber=menudata.menu[index].drinkNumber - 1;
+            $(obj).next().val(menudata.menu[index].drinkNumber)
+        }
+        event.stopPropagation();
+        //$(obj).next().val($(obj).next().val());//赋值给框
+    }
+    //加数量
+    function add(obj,index,event) {
+        //加前判断
+        if ($(obj).prev().val() == '') {
+            $(obj).prev().val(1);
+        }
+        //$(obj).prev().val(parseInt($(obj).prev().val()) + 1);//数值加
+        menudata.menu[index].drinkNumber=menudata.menu[index].drinkNumber + 1;
+        $(obj).prev().val(menudata.menu[index].drinkNumber)
+        //$(obj).prev().val($(obj).prev().val());//赋值给框
+        event.stopPropagation();
+    }
+    //校验数字格式（只能输入正整数）
+    /*function checkNumber(obj) {
+        var reg = /^[1-9]\d*$/;
+        if(!reg.test($(obj).val()) || $(obj).val()==''){
+            $(obj).val(1);
+        }
+    }*/
+
+    function clickItem(ele,index,number){
+        if(menudata.menu[index].ismenudataChecked==0)
+        {
+            ele.classList.add("itemchecked")
+            menudata.menu[index].ismenudataChecked=1
+            ele.querySelector("input").checked=true
+            menudata.menu[index].drinkNumber=1
+            var drinkvalue=ele.querySelector(".drinkvalue")
+            $(drinkvalue).val(menudata.menu[index].drinkNumber)
+            var drinkvaluecontroler=ele.querySelector(".drinkvaluecontroler")
+            $(drinkvaluecontroler).show()
+        }
+        else
+        {
+            ele.classList.remove("itemchecked")
+            menudata.menu[index].ismenudataChecked=0
+            ele.querySelector("input").checked=false
+            menudata.menu[index].drinkNumber=0
+            var drinkvalue=ele.querySelector(".drinkvalue")
+            $(drinkvalue).val(menudata.menu[index].drinkNumber)
+            var drinkvaluecontroler=ele.querySelector(".drinkvaluecontroler")
+            $(drinkvaluecontroler).hide()
+        }
+    }
+    function addOrder(ele)
+    {
+      var father=ele.parentNode
+        $(".orderfinished").hide()
+        $(father).hide()
+        $("#orderDetail").show()
+        //$(".orderId").hide()
+        orders={}
+        orders=JSON.parse("{\n" +
+            " \"orderID\" : \"114\",\n" +
+            " \"customerID\" : \"1\",\n" +
+            "    \"createTime\" : 12345678901,\n" +
+            "    \"orderDetail\": [\n" +
+            "  ]\n" +
+            "}")
+        var orderitemlist=[]
+        var cupNum=0;
+        $(".orderList").empty()
+        for(var i=0;i<menudata.menu.length;i++)
+        {
+            if(menudata.menu[i].ismenudataChecked==1)
+            {
+                for(var j=0;j<menudata.menu[i].drinkNumber;j++)
+                {
+                    var orderItem=JSON.parse("{\n" +
+                        "      \"drinkID\": 1118,\n" +
+                        "      \"cupType\": 1,\n" +
+                        "      \"temp\": 1,\n" +
+                        "      \"note\" : \"你好呀\"\n" +
+                        "    }")
+                    orderItem.drinkID=menudata.menu[i].productId;
+                    orderItem.cupType=1
+                    orderItem.temp=0
+                    orderItem.price=menudata.menu[i].price;
+                    orderItem.nameCn=menudata.menu[i].nameCn;
+                    orderitemlist.push(orderItem)
+                    var elestr="<div class=\"orderItem\">\n" +
+                        "                        <div>\n" +
+                        "\n" +
+                        "                        </div>\n" +
+                        "                        <div class=\"detailDrinkName\" style=\"width:30%\">\n" +
+                        "                            -\n" +
+                        "                        </div>\n" +
+                        "                        <div class=\"detailDrinkPrice\">\n" +
+                        "                            -\n" +
+                        "                        </div>\n" +
+                        "                        <div>\n" +
+                        "                            <button class=\"detailDrinkTemp layui-btn layui-btn-normal layui-btn-sm\" type=\"button\" onclick=\"changeTemp(this,"+cupNum+")\">冷饮</button>\n" +
+                        "                        </div>\n" +
+                        "                        <div>\n" +
+                        "                            <button class=\"detailDrinkSize layui-btn layui-btn-normal layui-btn-sm\" type=\"button\" onclick=\"changeSize(this,"+cupNum+")\">小杯</button>\n" +
+                        "                        </div>\n" +
+                        "                        <div>\n" +
+                        "                           "+menudata.menu[i].drinkNumber+"杯" +
+                        "                        </div>\n" +
+                        "                        <img class=\"detailpc\" src="+menudata.menu[i].img+" >\n" +
+                        "                        <div>\n" +
+                        "\n" +
+                        "                        </div>\n" +
+                        "                    </div>"
+                    var $newElement=$(elestr)
+                    $newElement.find(".detailDrinkName").get(0).innerHTML=""+menudata.menu[i].nameCn
+                    $newElement.find(".detailDrinkPrice").get(0).innerHTML="¥"+menudata.menu[i].price
+                    if(j==0)
+                    {
+                        $(".orderList").append($newElement)
+                    }
+                    cupNum++;
+
+                }
+            }
+        }
+        orders.orderDetail=orderitemlist
+
+    }
+    function showTab1()
+    {
+        $("#tabcontent1").show()
+        $("#tab1").addClass("tabc")
+        $("#tab1").removeClass("tabn")
+        $("#tabcontent2").hide()
+        $("#tab2").addClass("tabn")
+        $("#tab2").removeClass("tabc")
+        $("#tabcontent3").hide()
+        $("#tab3").addClass("tabn")
+        $("#tab3").removeClass("tabc")
+        $("#tabcontent4").hide()
+        $("#tab4").addClass("tabn")
+        $("#tab4").removeClass("tabc")
+    }
+    function showTab2()
+    {
+        $("#tabcontent1").hide()
+        $("#tab1").addClass("tabn")
+        $("#tab1").removeClass("tabc")
+        $("#tabcontent2").show()
+        $("#tab2").addClass("tabc")
+        $("#tab2").removeClass("tabn")
+        $("#tabcontent3").hide()
+        $("#tab3").addClass("tabn")
+        $("#tab3").removeClass("tabc")
+        $("#tabcontent4").hide()
+        $("#tab4").addClass("tabn")
+        $("#tab4").removeClass("tabc")
+    }
+
+    function showTab3()
+    {
+        $("#tabcontent1").hide()
+        $("#tab1").addClass("tabn")
+        $("#tab1").removeClass("tabc")
+        $("#tabcontent2").hide()
+        $("#tab2").addClass("tabn")
+        $("#tab2").removeClass("tabc")
+        $("#tabcontent3").show()
+        $("#tab3").addClass("tabc")
+        $("#tab3").removeClass("tabn")
+        $("#tabcontent4").hide()
+        $("#tab4").addClass("tabn")
+        $("#tab4").removeClass("tabc")
+    }
+
+    function showTab4()
+    {
+        $("#tabcontent1").hide()
+        $("#tab1").addClass("tabn")
+        $("#tab1").removeClass("tabc")
+        $("#tabcontent2").hide()
+        $("#tab2").addClass("tabn")
+        $("#tab2").removeClass("tabc")
+        $("#tabcontent3").hide()
+        $("#tab3").addClass("tabn")
+        $("#tab3").removeClass("tabc")
+        $("#tabcontent4").show()
+        $("#tab4").addClass("tabc")
+        $("#tab4").removeClass("tabn")
+    }
+
+function generateOrder()
+    {
+        var price=0
+        for(var i=0;i<orders.orderDetail.length;i++){
+            price+=orders.orderDetail[i].price
+        }
+        var str=""
+        var tempstr=orders.orderDetail[0].nameCn
+        var templen=1
+        for(var i=1;i<orders.orderDetail.length;i++)
+        {
+            if(tempstr==orders.orderDetail[i].nameCn)
+            {
+                templen++
+            }
+            else
+            {
+                str=str+tempstr+templen+"杯，"
+                tempstr=orders.orderDetail[i].nameCn
+                templen=1
+            }
+        }
+        str=str+tempstr+templen+"杯。"
+        layui.use('layer', function(){
+            layer.open({
+                type: 1
+                ,title: false //不显示标题栏
+                ,closeBtn: false
+                ,area: '300px;'
+                ,shade: 0.8
+                ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                ,btn: ['确认', '取消']
+                ,btnAlign: 'c'
+                ,moveType: 1 //拖拽模式，0或者1
+                ,content: '<div style="padding: 50px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;">是否确认下单？<br>您的订单包含：'+str+'<br><br>总价格是'+price+'元<br><br>祝您心情愉快</div>'
+                ,success: function(layero){
+                    var btn = layero.find('.layui-layer-btn');
+                    btn.find('.layui-layer-btn0').get(0).onclick=function()
+                    {
+                        sendOrderRequest()
+                    }
+                }
+            });
+        });
+    }
+    function sendOrderRequest()
+    {
+        $(".orderList").hide();
+        $(".loadPic").show()
+        //orders.customerID="1"
+        var d=new Date();
+        orders.orderID=""+d.getTime()
+        $(".orderId").text("订单Id："+d.getTime())
+        $.ajax({
+            //请求方式
+            type : "POST",
+            //请求的媒体类型
+            contentType: "application/json;charset=UTF-8",
+            //请求地址
+            url :remote+ "/api/v1/menu/addDrinkOrder",
+            //数据，json字符串
+            data : JSON.stringify(orders),
+            //请求成功
+            success : function(result) {
+                if(result.errno!=0)
+                {
+                    layer.open({
+                        type: 1
+                        ,offset: 'rb' //具体配置参考：http://www.layui.com/doc/modules/layer.html#offset
+                        ,id: 'layerDemo'+'rb' //防止重复弹出
+                        ,content: '<div style="padding: 20px 100px;">'+'下单失败' +'</div>'
+                        ,btn: '关闭全部'
+                        ,btnAlign: 'c' //按钮居中
+                        ,shade: 0 //不显示遮罩
+                        ,yes: function(){
+                            layer.closeAll();
+                        }
+                    });
+                }
+                back=1;
+                //$(".orderId").show();
+                $(".orderList").show();
+                $(".loadPic").hide();
+                $(".orderfinished").show()
+                $("#generateOrder").attr('disabled',true);
+                var eleStr="<div class=\"orderId\">\n" +
+                    "                        订单ID：\n" +
+                    "                    </div>"
+                var $orderId=$(eleStr)
+                $orderId.text("订单ID："+result.billID)
+                $(".orderList").prepend($orderId)
+                var eleList=$(".orderItem")
+                for(var i=0;i<orders.orderDetail.length;i++)
+                {
+                    var ele=eleList.get(i);
+                    if(ele!=null)
+                    {
+                        $(ele).removeClass("orderItem")
+                        $(ele).addClass("finishedorderItem")
+                        $(ele).find("button").get(0).disabled=true
+                        $(ele).find("button").get(1).disabled=true
+                    }
+                }
+                console.log(result);
+                layer.open({
+                    type: 1
+                    ,offset: 'rb' //具体配置参考：http://www.layui.com/doc/modules/layer.html#offset
+                    ,id: 'layerDemo'+'rb' //防止重复弹出
+                    ,content: '<div style="padding: 20px 100px;">'+'下单成功' +'</div>'
+                    ,btn: '关闭全部'
+                    ,btnAlign: 'c' //按钮居中
+                    ,shade: 0 //不显示遮罩
+                    ,yes: function(){
+                        layer.closeAll();
+                    }
+                });
+
+            },
+            //请求失败，包含具体的错误信息
+            error : function(e){
+                $(".orderList").show();
+                $(".loadPic").hide()
+                console.log(e.status);
+                console.log(e.responseText);
+                layer.open({
+                    type: 1
+                    ,offset: 'rb' //具体配置参考：http://www.layui.com/doc/modules/layer.html#offset
+                    ,id: 'layerDemo'+'rb' //防止重复弹出
+                    ,content: '<div style="padding: 20px 100px;">'+'下单失败' +'</div>'
+                    ,btn: '关闭全部'
+                    ,btnAlign: 'c' //按钮居中
+                    ,shade: 0 //不显示遮罩
+                    ,yes: function(){
+                        layer.closeAll();
+                    }
+                });
+            }
+        });
+    }
+    var back=0
+    function backToDrinkOrOrder(ele)
+    {
+        if(back==0)
+        {
+            $("#drinkList").show()
+            var father=ele.parentNode
+            $(father).hide()
+        }
+        else
+        {
+            $(".orderId").remove()
+            $(".orderfinished").hide()
+            $("#generateOrder").attr('disabled',false);
+            var eleList=$(".finishedorderItem")
+            for(var i=0;i<orders.orderDetail.length;i++)
+            {
+                var ele=eleList.get(i);
+                if(ele!=null)
+                {
+                    ele.classList.add("orderItem")
+                    ele.classList.remove("finishedorderItem")
+                    $(ele).find("button").get(0).disabled=false
+                    $(ele).find("button").get(1).disabled=false
+                }
+            }
+            back=0
+        }
+
+    }
+    function changeTemp(ele,index){
+        if(orders.orderDetail[index].temp==1)
+        {
+            ele.innerHTML="冷饮"
+            orders.orderDetail[index].temp=0
+            var i=index;
+            for(;;)
+            {   i++;
+                if(i==orders.orderDetail.length)
+                    break;
+                if(orders.orderDetail[i].nameCn==orders.orderDetail[index].nameCn)
+                    orders.orderDetail[i].temp=0
+                else
+                    break;
+            }
+        }
+        else
+        {
+            ele.innerHTML="热饮"
+            orders.orderDetail[index].temp=1
+            var i=index;
+            for(;;)
+            {   i++;
+                if(i==orders.orderDetail.length)
+                    break;
+                if(orders.orderDetail[i].nameCn==orders.orderDetail[index].nameCn)
+                    orders.orderDetail[i].temp=1
+                else
+                    break;
+            }
+        }
+        event.stopPropagation();
+    }
+    function changeSize(ele,index){
+        if(orders.orderDetail[index].cupType==1)
+        {
+            ele.innerHTML="大杯"
+            orders.orderDetail[index].cupType=0
+            var i=index;
+            for(;;)
+            {   i++;
+                if(i==orders.orderDetail.length)
+                    break;
+                if(orders.orderDetail[i].nameCn==orders.orderDetail[index].nameCn)
+                    orders.orderDetail[i].cupType=0
+                else
+                    break;
+            }
+        }
+        else
+        {
+            ele.innerHTML="小杯"
+            orders.orderDetail[index].cupType=1
+            var i=index;
+            for(;;)
+            {   i++;
+                if(i==orders.orderDetail.length)
+                    break;
+                if(orders.orderDetail[i].nameCn==orders.orderDetail[index].nameCn)
+                    orders.orderDetail[i].cupType=1
+                else
+                    break;
+            }
+        }
+        event.stopPropagation();
+    }
+    function enterinitial()
+    {
+        $("#welcome").hide()
+    }
+    function enterwelcome()
+    {
+    $("#welcome").show()
+    }
+    var menudata
+    //var ismenudataChecked=[]
+    //var drinkNumber=[]
+    var orders={}
+    //var ismenudataRec=[]
+    $(document).ready(function(){
+        //$("#orderDetail").hide()
+        $(".loadPic").hide()
+        $.ajax({
+            //请求方式
+            type : "GET",
+            //请求的媒体类型
+            contentType: "application/json;charset=UTF-8",
+            //请求地址
+            url : remote+"/api/v1/menu/todayDrink",
+            //数据，json字符串
+            //data : JSON.stringify(list),
+            //请求成功
+            success : function(result) {
+                if(result.errno!=0)
+                {
+                    layer.open({
+                        type: 1
+                        ,offset: 'rb' //具体配置参考：http://www.layui.com/doc/modules/layer.html#offset
+                        ,id: 'layerDemo'+'rb' //防止重复弹出
+                        ,content: '<div style="padding: 20px 100px;">'+'请求数据失败' +'</div>'
+                        ,btn: '关闭全部'
+                        ,btnAlign: 'c' //按钮居中
+                        ,shade: 0 //不显示遮罩
+                        ,yes: function(){
+                            layer.closeAll();
+                        }
+                    });
+                }
+                $("#load").hide()
+                console.log(result);
+                menudata=result
+                var menus=menudata.menu;
+                var length=menus.length;
+                for(var i=0;i<length;i++)
+                {
+                    menudata.menu[i].ismenudataChecked=0;
+                    menudata.menu[i].drinkNumber=0;
+                    menudata.menu[i].ismenudataRec=0;
+                }
+                $("#tabcontent2").hide()
+                $("#tabcontent3").hide()
+                $("#tabcontent4").hide()
+                for(var i=0;i<length;i++)
+                {
+                    var elementStr="<div class=\"item\" onclick=\"clickItem(this,"+i+","+menudata.menu[i].drinkNumber+")\">\n" +
+                        "                        <div>\n" +
+                        "                        </div>\n" +
+                        "                        <input name=\"\" type=\"checkbox\" value=\"\" />\n" +
+                        "                        <div class=\"drinkdes\" style=\"width:40%\">\n" +
+                        "                            <div class=\"drinkname\">\n" +
+                        "                                -\n" +
+                        "                            </div>\n" +
+                        "                            <div class=\"drinkprice\">\n" +
+                        "                                -\n" +
+                        "                            </div>\n" +
+                        "                            <div class=\"drinkvaluecontroler\" style=\"display:flex;height:33%;justify-content: center;align-items: center;flex-direction:row;\">\n" +
+                        "\n" +
+                        "                                <input style=\"width: 33%; height: 100%; border: 2px white; \" type=\"button\" value=\"-\" onclick=\"reductionOf(this,"+i+",event)\" />\n" +
+                        "\n" +
+                        "                                <input class=\"drinkvalue\" style=\"text-align: center; width: 33%; height: 100%; \" type=\"text\" value=\""+menudata.menu[i].drinkNumber+"\" />\n" +
+                        "\n" +
+                        "                                <input style=\"width: 33%; height:  100%; border: 2px white;\" type=\"button\" value=\"+\" onclick=\"add(this,"+i+",event)\" />\n" +
+                        "\n" +
+                        "                            </div>\n" +
+                        "                        </div>\n" +
+                        //"                        <img class=\"drinkpc\" src="+menus[i].img+" >\n" +
+                        "<div class=\"drinkpc\" style=\"position:relative\">\n" +
+                        "                            <img style=\"width:100%;height:100%\" src="+menus[i].img+" >\n" +
+                        "                            <img class=\"rec\" style=\"position:absolute;top:1%;right:1%;width:60%;height:60%\" src=\"./images/rec.png\">\n" +
+                        "                        <div>\n" +
+                        "                        </div>\n" +
+                        "                    </div>"
+                    /*var elementStr="                        <div class=\"temAndSize\">\n" +
+                        "                            <div class=\"layui-row\" style=\"padding-bottom: 5px\">\n" +
+                        "                                <button onclick=\"changeTemp(this,"+i+")\" class=\"drinkTemp layui-btn layui-btn-normal layui-btn-sm\" type=\"button\">常温</button>\n" +
+                        "                            </div>\n" +
+                        "                            <div class=\"layui-row\">\n" +
+                        "                                <button onclick=\"changeSize(this,"+i+")\" class=\"drinkSize layui-btn layui-btn-normal layui-btn-sm\" type=\"button\">小杯</button>\n" +
+                        "                            </div>\n" +
+                        "                        </div>" +*/
+                    var $newElement=$(elementStr)
+                    if(menus[i].ismenudataChecked==1)
+                    {
+                        $newElement.addClass("itemchecked")
+                        $newElement.find("input").get(0).checked=true;
+                    }
+                    else
+                    {
+                        var a=$newElement.find(".drinkvaluecontroler").get(0);
+                        $(a).hide()
+                        /*if(i>=recNum)
+                        {
+                            $newElement.find(".rec").get(0).style.visibility="hidden";
+                        }*/
+                    }
+                    if(menus[i].ismenudataRec==0)
+                    {
+                        $newElement.find(".rec").get(0).style.visibility="hidden";
+                    }
+                    else
+                    {
+                        $newElement.addClass("itemRec")
+                    }
+                    $newElement.find(".drinkname").get(0).innerHTML=""+menus[i].nameCn
+                    $newElement.find(".drinkprice").get(0).innerHTML="¥"+menus[i].price
+                    if(menus[i].ismenudataRec==1)
+                    {
+                        $("#tabcontent4").append($newElement)
+                    }
+                    else if(menus[i].category=="咖啡")
+                    {
+                        $("#tabcontent1").append($newElement)
+                    }
+                    else if(menus[i].category=="鸡尾酒")
+                    {
+                        $("#tabcontent2").append($newElement)
+                    }
+                    else
+                    {
+                        $("#tabcontent3").append($newElement)
+                    }
+                }
+            },
+            //请求失败，包含具体的错误信息
+            error : function(e){
+                console.log(e.status);
+                console.log(e.responseText);
+            }
+        });
+    });
+
+const update_raw_rect = setInterval(function () {
+    $.getJSON("/api/raw_rect.json", function(data) {
+        // console.log(data)
+        if (data) {
+            data = data[0]
+            document.getElementById("raw_rect").style["left"] = `${data[0]}px`;
+            document.getElementById("raw_rect").style["top"] = `${data[1]}px`;
+            document.getElementById("raw_rect").style["width"] = `${Math.abs(data[2] - data[0])}px`;
+            document.getElementById("raw_rect").style["height"] = `${Math.abs(data[3] - data[1])}px`;
+        }
+
+
+    })
+}, 100)
+var tempData={}
+const update_speech_data = setInterval(function () {
+    $.getJSON("/api/speechData", function(data) {
+        // console.log(data)
+        if (data) {
+            if(JSON.stringify(tempData)==JSON.stringify(data))
+                return;
+            console.log("speechData")
+            console.log(data)
+            var age=$("#face_age").text()
+            if(age!=data.age)
+            $("#face_age").html (data.age);
+            var gender=$("#face_gender").text()
+            if(gender!=data.gender)
+            $("#face_gender").html (data.gender);
+            var name=$("#face_name").text()
+	    conole.log(1111, name, data.name, (data.name.startsWith("unknown_"))
+            if(name!=data.name)
+            $("#face_name").html ( data.name  );
+            var result=$("#language").text()
+            if(result!=data.speechRecoResult)
+			$("#language").html(data.speechRecoResult);
+            if(data.pageStatus=="idle")
+            {
+                enterwelcome()
+            }
+            if(data.pageStatus=="working")
+            {
+                enterinitial()
+                $("#backbutton").click();
+                $("#backbutton").click();
+                for(var i=0;i<menudata.menu.length;i++)
+                {
+                    menudata.menu[i].ismenudataChecked=0;
+                }
+                if(data.name!=tempData.name)
+                {
+                    recommend()
+                    console.log("recommend")
+                    console.log(data.name)
+                }
+
+            }
+            if(data.pageStatus=="orderInfo")
+            {
+                enterinitial()
+                $("#backbutton").click();
+                $("#backbutton").click();
+                var i=0;
+                for(i;i<menudata.menu.length;i++)
+                {
+                    if(menudata.menu[i].nameCn==data.OrderInfo.DrinkName)
+                    {
+                        menudata.menu[i].ismenudataChecked=1;
+                        break;
+                    }
+                }
+                menudata.menu[i].drinkNumber=parseInt(data.OrderInfo.CupNum);
+                console.log(menudata.menu[i].drinkNumber)
+                $("#addOrder").click()
+                if(data.OrderInfo.CupType=="1")
+                {
+                    $(".orderItem .detailDrinkSize").click()
+                }
+                if(data.OrderInfo.Temp=="1")
+                {
+                    $(".orderItem .detailDrinkTemp").click()
+
+                }
+
+                if(data.OrderInfo.OrderFinish=="true")
+                {
+                    sendOrderRequest()
+                }
+                else{
+
+                }
+            }
+            tempData=data
+        }
+
+
+    })
+}, 1000)
+const update_rect = setInterval(function () {
+
+    $.getJSON("/api/face_rect.json", function(data) {
+        // console.log(data, $("#face_rect"))
+
+        $("#face_rect").html()
+
+        if (data) {
+
+            console.log(1111111, data, data.user_name.startsWith("unknown_"))
+
+            if ('to' in data && data['to']) {
+
+                document.getElementById("face_rect").style["left"]  = `-10px`;
+                document.getElementById("face_rect").style["top"]  = `-10px`;
+                document.getElementById("face_rect").style["width"]  = `0px`;
+                document.getElementById("face_rect").style["height"]  = `0px`;
+
+                //$("#face_age").html('-');
+                //$("#face_gender").html('-');
+                $("#face_glass").html('-');
+                $("#face_expression").html('-');
+                //$("#face_name").html('-');
+
+
+            } else {
+
+                if ('location' in data) {
+                    document.getElementById("face_rect").style["left"] = data.location[0];
+                    document.getElementById("face_rect").style["top"] = data.location[1];
+                    document.getElementById("face_rect").style["width"] = data.location[2];
+                    document.getElementById("face_rect").style["height"] = data.location[3];
+
+                    if (data.age !== null) {
+                        $("#face_age").html (data.age);
+                        $("#face_gender").html (data.gender);
+                        $("#face_glass").html (data.glasses);
+                        $("#face_expression").html (data.emotion);
+
+
+                        $("#face_name").html (  (data.user_name.startsWith("unknown_"))?"Stranger":data.user_name );
+                    }
+                }
+
+            }
+
+        } else {
+
+        }
+
+        // document.getElementById("face_rect").style["left"]  = '1900px';
+        // document.getElementById("face_rect").style["top"]  = '1060px';
+        // document.getElementById("face_rect").style["width"]  = '20px';
+        // document.getElementById("face_rect").style["height"]  = '20px';
+
+        // $("#face_rect").html(`${$(window).height()}x${$(window).width()}`)
+    });
+}, 100)
+
+</script>
+
+
+</html>

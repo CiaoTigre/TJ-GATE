@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Human Pose Detection - BISL</title>
+    <style type="text/css">
+        html, body {
+            margin: 0;
+            height: 100%;
+        }
+
+        body {
+
+            background-color: #000000;
+            margin: 0;
+            font-family: Helvetica, sans-serif;;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+        }
+        .element {
+
+            /*width: 200px;*/
+            /*height: 220px;*/
+            box-shadow: 0px 0px 12px rgba(0,255,255,0.5);
+            border: 1px solid rgba(127,255,255,0.25);
+            text-align: center;
+            cursor: default;
+        }
+
+        .element:hover {
+            box-shadow: 0px 0px 12px rgba(0,255,255,0.75);
+            border: 1px solid rgba(127,255,255,0.75);
+        }
+
+        .element .number {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 12px;
+            color: rgba(127,255,255,0.75);
+        }
+
+        .element .symbol {
+            position: absolute;
+            top: 5px;
+            left: 0px;
+            right: 0px;
+            font-size: 30px;
+            font-weight: bold;
+            color: rgba(255,255,255,0.75);
+            text-shadow: 0 0 10px rgba(0,255,255,0.95);
+        }
+
+        .element .details {
+            position: absolute;
+            bottom: 15px;
+            left: 0px;
+            right: 0px;
+            font-size: 18px;
+            color: rgba(127,255,255,0.75);
+        }
+
+    </style>
+</head>
+<body onload="draw();">
+<div style="float: left; width: 50%">
+    <div style="width: 100vh; height: 100vh; overflow: hidden">
+        <img src="smpl_orig.mjpg" style="height:100%; margin: -0px 0 0 -110px;">
+        <!--<video src="http://localhost:3000/face.mjpg" controls>-->
+        <!--Your browser does not support the <code>video</code> element.-->
+        <!--</video>-->
+    </div>
+
+    <!--<div style="float: right">-->
+    <!--<div class="element" style="position:absolute; top:120px; right:45%; width:200px; height:220px; background-color: rgba(0, 127, 127, 0.360784);  transform: translate(-50%, -50%) ">-->
+        <!--&lt;!&ndash;<div class="number">1</div>&ndash;&gt;-->
+        <!--<div class="symbol">识别信息</div>-->
+        <!--<div class="details" >-->
+            <!--<table style="width:100%; position:absolute; bottom:0; left:20px;">-->
+                <!--<tr>-->
+                    <!--<td align="left">姓名</td><td id="face_name" align="left">-</td>-->
+                <!--</tr>-->
+                <!--<tr>-->
+                    <!--<td align="left">性别</td><td id="face_gender" align="left">1</td>-->
+                <!--</tr>-->
+                <!--<tr>-->
+                    <!--<td align="left">年龄</td><td id="face_age" align="left">1</td>-->
+                <!--</tr>-->
+                <!--<tr>-->
+                    <!--<td align="left">心率</td><td id="face_heart" align="left">1</td>-->
+                <!--</tr>-->
+                <!--<tr>-->
+                    <!--<td align="left">表情</td><td id="face_expression" align="left">1</td>-->
+                <!--</tr>-->
+
+            <!--</table>-->
+
+        <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+</div>
+<div id="mask" style="float: right; width: 50%; "></div>
+
+
+</body>
+<script src="javascripts/three.js"></script>
+<script src="javascripts/OBJLoader.js"></script>
+<script src="javascripts/LoaderSupport.js"></script>
+<script src="javascripts/OBJLoader2.js"></script>
+<script src="javascripts/OrbitControls.js"></script>
+<script src="javascripts/libs/stats.min.js"></script>
+<script src="javascripts/libs/dat.gui.min.js"></script>
+<script src="javascripts/libs/jquery-3.4.0.min.js"></script>
+
+<script>
+
+    const OBJ = {
+        name: "SMPL",
+        first_time: '1_0.ply',
+        real_time: 'result.obj',
+        scale: 21,
+        x:0,y:0,z:0,
+        rx:Math.PI,ry:0,rz:0,
+        color:0xF8C5B7
+    };
+
+
+    // const OBJ_FILE = '/result.obj';
+    // const OBJ_FILE = 'result1111.obj';
+
+    var renderer;
+
+    function initRender() {
+
+        renderer = new THREE.WebGLRenderer({antialias:true});
+
+        renderer.setSize(window.innerWidth/2, window.innerHeight);
+
+        //告诉渲染器需要阴影效果
+
+        renderer.setClearColor(0xffffff);
+
+        document.getElementById("mask").appendChild(renderer.domElement);
+
+    }
+
+
+
+    var camera;
+
+    var SCREEN_WIDTH = window.innerWidth;
+    var SCREEN_HEIGHT = window.innerHeight;
+    var aspect = SCREEN_WIDTH /2/ SCREEN_HEIGHT;
+
+    var cameraRig, activeCamera, activeHelper;
+    var cameraPerspective, cameraOrtho;
+    var cameraPerspectiveHelper, cameraOrthoHelper;
+    var frustumSize = 600;
+
+    function initCamera() {
+
+        camera = new THREE.PerspectiveCamera(90, window.innerWidth/2/window.innerHeight, 0.1, 1000);
+
+        camera.position.set(0, 40, 50);
+
+        camera.lookAt(new THREE.Vector3(0,0,0));
+
+
+        // cameraPerspectiveHelper = new THREE.CameraHelper( camera );
+        // scene.add( cameraPerspectiveHelper );
+
+
+
+        // //
+        // cameraPerspective = camera;
+        //
+        // cameraOrtho = new THREE.OrthographicCamera( 0.5 * frustumSize * aspect / - 2, 0.5 * frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 150, 1000 );
+        //
+        // cameraOrthoHelper = new THREE.CameraHelper( cameraOrtho );
+        // scene.add( cameraOrthoHelper );
+        //
+        // //
+        //
+        // activeCamera = cameraPerspective;
+        // activeHelper = cameraPerspectiveHelper;
+        //
+        //
+        // // counteract different front orientation of cameras vs rig
+        //
+        // cameraOrtho.rotation.y = Math.PI;
+        // cameraPerspective.rotation.y = Math.PI;
+        //
+        // cameraRig = new THREE.Group();
+        //
+        // cameraRig.add( cameraPerspective );
+        // cameraRig.add( cameraOrtho );
+        //
+        // scene.add( cameraRig );
+
+    }
+
+
+
+    var scene;
+
+    function initScene() {
+
+        scene = new THREE.Scene();
+
+    }
+
+
+    //初始化dat.GUI简化试验流程
+
+    var gui;
+
+    function initGui() {
+
+        //声明一个保存需求修改的相关数据的对象
+
+        gui = {
+
+        };
+
+        var datGui = new dat.GUI();
+
+        //将设置属性添加到gui当中，gui.add(对象，属性，最小值，最大值）
+        dat.GUI.toggleHide();
+
+    }
+
+    var light;
+
+    function initLight() {
+
+        scene.add(new THREE.AmbientLight(0x444444));
+
+        light = new THREE.PointLight(0xffffff);
+        light.position.set(0,0,100);
+
+        //告诉平行光需要开启阴影投射
+
+        light.castShadow = true;
+        scene.add(light);
+
+        // var directionalLight = new THREE.DirectionalLight(0xffffff);
+        // directionalLight.position.set(1, 1, 1).normalize();
+        // scene.add(directionalLight);
+
+        // var texture = new THREE.TextureLoader().load( "images/bg14.png",);
+        // scene.background = texture;
+
+
+        scene.background = new THREE.Color( 0x0B0B0B );
+
+        //GRID HELPTER
+        var helper = new THREE.GridHelper( 1200, 60, 0x444444, 0x444444);
+        helper.position.set(0, -45, 0 );
+
+        this.scene.add( helper );
+
+
+    }
+
+    var objloader = new THREE.OBJLoader();
+    var smplObj = null;
+    var material = new THREE.MeshLambertMaterial({color: OBJ.color,flatShading: false});
+
+    // var material;
+    // var textureloader = new THREE.TextureLoader();
+    //     textureloader.load( "/resource/model/SMPL_sampleTex_f.jpg", function (skin) {
+    //         console.log(skin)
+    //         material = new THREE.MeshBasicMaterial( { map: skin } );
+    //     });
+    //
+
+    function updateModel() {
+
+        // console.time("OBJLoad1")
+        // objloader.setMaterials(material);
+        objloader.load(OBJ.real_time,function (loadedMesh) {
+
+
+            loadedMesh.children.forEach(function (child) {
+
+                child.material = material;
+
+                // "https://stackoverflow.com/questions/35843167/three-js-smoothing-normals-using-mergevertices"
+                var tempGeo = new THREE.Geometry().fromBufferGeometry(child.geometry);
+
+                tempGeo.mergeVertices();
+                tempGeo.computeVertexNormals();
+                tempGeo.computeFaceNormals();
+
+                child.geometry = new THREE.BufferGeometry().fromGeometry(tempGeo);
+
+                tempGeo.dispose();
+                tempGeo = null;
+
+            });
+
+            loadedMesh.name = OBJ.name;
+            //模型放大
+            loadedMesh.scale.set(OBJ.scale, OBJ.scale, OBJ.scale);
+            loadedMesh.rotation.set(OBJ.rx, OBJ.ry, OBJ.rz);
+            scene.remove(scene.getObjectByName(OBJ.name));
+            if (smplObj) {
+
+                smplObj.children.forEach(function (child) {
+                    child.material.dispose();
+                    delete child.material;
+                    child.geometry.dispose();
+                    delete child.geometry;
+                });
+                delete smplObj;
+            }
+
+            scene.add(loadedMesh);
+            smplObj = loadedMesh;
+
+
+            // console.log(scene)
+            // render();
+            // console.timeEnd("OBJLoad1")
+
+        });
+    }
+
+    function initModel() {
+
+        //辅助工具
+        // var helper = new THREE.AxesHelper(50);
+        // scene.add(helper);
+
+        //加载OBJ格式的模型
+        updateModel();
+
+    }
+
+    //初始化性能插件
+    var stats;
+
+    function initStats() {
+
+        stats = new Stats();
+
+        document.getElementById("mask").appendChild(stats.dom);
+
+    }
+
+    //用户交互插件 鼠标左键按住旋转，右键按住平移，滚轮缩放
+
+    var controls;
+
+    function initControls() {
+
+        controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+        // 如果使用animate方法时，将此函数删除
+
+        //controls.addEventListener( 'change', render );
+
+        // 使动画循环使用时阻尼或自转 意思是否有惯性
+
+        controls.enableDamping = true;
+
+        //动态阻尼系数 就是鼠标拖拽旋转灵敏度
+
+        //controls.dampingFactor = 0.25;
+
+        //是否可以缩放
+
+        controls.enableZoom = true;
+
+        //是否自动旋转
+
+        controls.autoRotate = false;
+
+        //设置相机距离原点的最远距离
+
+        controls.minDistance  = 1;
+
+        //设置相机距离原点的最远距离
+
+        controls.maxDistance  = 200;
+
+        //是否开启右键拖拽
+
+        controls.enablePan = true;
+
+    }
+
+
+
+    function render() {
+
+        // console.log(camera.position.x, camera.position.y, camera.position.z, camera.getFocalLength())
+        renderer.render( scene, camera );
+
+    }
+
+
+    //窗口变动触发的函数
+    function onWindowResize() {
+
+        camera.aspect = window.innerWidth / 2 / window.innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        render();
+
+        renderer.setSize( window.innerWidth/2, window.innerHeight );
+
+    }
+
+
+
+    function animate() {
+
+        //更新控制器
+
+        render();
+
+        //更新性能插件
+
+        if (stats)
+            stats.update();
+
+        controls.update();
+
+        requestAnimationFrame(animate);
+
+    }
+
+
+
+    function draw2() {
+        setInterval( function(){
+            return updateModel();
+        },100)
+    }
+
+    function draw() {
+
+        initGui();
+
+        initRender();
+
+        initScene();
+
+        initCamera();
+
+        initLight();
+
+        initModel();
+
+        initControls();
+
+        // initStats();
+
+        draw2();
+
+        animate();
+
+        window.onresize = onWindowResize;
+
+    }
+
+</script>
+</html>

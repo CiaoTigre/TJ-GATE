@@ -1,0 +1,24 @@
+{
+  "version": 0.1,
+  "name": "trackingEye",
+  "localDB": "mysql_local_station",
+  "mysql_local_station": {
+    "server": "192.168.31.184",
+    "port": 3306,
+    "user": "heatmap",
+    "password": "heatmap@401",
+    "database": "cvtest1"
+  },
+  "mysql_remote_station": {
+    "server": "h25127m776.zicp.vip",
+    "port": 39229,
+    "user": "heatmap",
+    "password": "heatmap@401",
+    "database": "cvtest1"
+  },
+  "redis": {
+    "host": "rabbitmq.eicp.vip",
+    "port": 31002,
+    "qname_track": "track"
+  }
+}

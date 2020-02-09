@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Facial Pose Detection - BISL</title>
+    <style type="text/css">
+        html, body {
+            margin: 0;
+            height: 100%;
+        }
+
+        body {
+
+            background-color: #000000;
+            margin: 0;
+            font-family: Helvetica, sans-serif;;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+        }
+        .element {
+
+            /*width: 200px;*/
+            /*height: 220px;*/
+            box-shadow: 0px 0px 12px rgba(0,255,255,0.5);
+            border: 1px solid rgba(127,255,255,0.25);
+            text-align: center;
+            cursor: default;
+        }
+
+        .element:hover {
+            box-shadow: 0px 0px 12px rgba(0,255,255,0.75);
+            border: 1px solid rgba(127,255,255,0.75);
+        }
+
+        .element .number {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 12px;
+            color: rgba(127,255,255,0.75);
+        }
+
+        .element .symbol {
+            position: absolute;
+            top: 5px;
+            left: 0px;
+            right: 0px;
+            font-size: 30px;
+            font-weight: bold;
+            color: rgba(255,255,255,0.75);
+            text-shadow: 0 0 10px rgba(0,255,255,0.95);
+        }
+
+        .element .details {
+            position: absolute;
+            bottom: 15px;
+            left: 0px;
+            right: 0px;
+            font-size: 18px;
+            color: rgba(127,255,255,0.75);
+        }
+
+    </style>
+</head>
+<body>
+<div style="float: left; width: 50%">
+    <div style="width: 100vh; height: 100vh; overflow: hidden">
+        <img src="smpl_orig.mjpg" style="height:100%; margin: -0px 0 0 -110px;">
+    </div>
+
+    <!--<div style="float: right">-->
+    <div class="element" style="position:absolute; top:120px; right:45%; width:200px; height:220px; background-color: rgba(0, 127, 127, 0.360784);  transform: translate(-50%, -50%) ">
+        <!--<div class="number">1</div>-->
+        <div class="symbol">识别信息</div>
+        <div class="details" >
+            <table style="width:100%; position:absolute; bottom:0; left:20px;">
+                <tr>
+                    <td align="left">姓名</td><td id="face_name" align="left">-</td>
+                </tr>
+                <tr>
+                    <td align="left">性别</td><td id="face_gender" align="left">1</td>
+                </tr>
+                <tr>
+                    <td align="left">年龄</td><td id="face_age" align="left">1</td>
+                </tr>
+                <tr>
+                    <td align="left">心率</td><td id="face_heart" align="left">1</td>
+                </tr>
+                <tr>
+                    <td align="left">表情</td><td id="face_expression" align="left">1</td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+    <!--</div>-->
+</div>
+<div id="mask" style="float: right; width: 50%">
+    <div style="width: 100vh; height: 100vh; overflow: hidden">
+        <img src="smpl_render.mjpg" style="width:100%; height:100%;">
+    </div>
+
+</div>
+
+
+</body>
+
+
+
+</html>
+
